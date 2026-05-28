@@ -5,4 +5,4 @@ import psycopg2
 
 engine = create_engine(DB_URL)
 
-session_maker = sessionmaker(bind=engine)
+sessionLocal = sessionmaker(bind=engine)

@@ -1,4 +1,4 @@
-from database.db.Base import Base
+from database.Base import Base
 from sqlalchemy import Column, Integer, String
 
 class Games(Base):
