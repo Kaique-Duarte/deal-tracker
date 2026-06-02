@@ -1,16 +1,12 @@
 from config.settings import TOKEN
 import asyncio
-from aiogram import Bot, Dispatcher, types
-from bot.DealTrackerBot import DealTrackerBot
-from database.Engine import engine
-from database.Base import Base
+
+from bot.deal_tracker_bot import DealTrackerBot
+from database.engine import engine
+from database.base import Base
 async def main():
     Base.metadata.create_all(engine)
     
-    
-        
-    
-        
     bot = DealTrackerBot(TOKEN)
     print("BOT Iniciado Com Sucesso :)")
     await bot.run()

@@ -1,7 +1,7 @@
 from aiogram import types, Router
 from aiogram.filters import Command
-from database.Engine import sessionLocal
-from services.UserServices import UserServices
+from database.engine import sessionLocal
+from services.user_services import UserServices
 router =  Router()
 
 

@@ -1,5 +1,5 @@
-from database.Base import Base
-from sqlalchemy import Column, Integer, String, Float, BigInteger
+from database.base import Base
+from sqlalchemy import Column, Integer, BigInteger
 
 
 
