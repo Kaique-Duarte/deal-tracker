@@ -1,0 +1,27 @@
+services:
+  bot:
+    build: . 
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    volumes: # dev
+      - .:/app
+    command: sh -c "pip install -r requirements.txt && watchmedo auto-restart --patterns='*.py' --recursive -- python main.py"
+
+  postgres:
+    image: postgres:17
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:  # dev
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
