@@ -4,6 +4,8 @@ import asyncio
 from bot.deal_tracker_bot import DealTrackerBot
 from database.engine import engine
 from database.base import Base
+from models.user import User
+from models.games import Games
 async def main():
     Base.metadata.create_all(engine)
     

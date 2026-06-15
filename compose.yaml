@@ -6,8 +6,8 @@ services:
     depends_on:
       - postgres
     volumes: # dev
-      - .:/app
-    command: sh -c "pip install -r requirements.txt && watchmedo auto-restart --patterns='*.py' --recursive -- python main.py"
+      - .:/usr/src/app
+    command: watchfiles "python main.py" .
 
   postgres:
     image: postgres:17
