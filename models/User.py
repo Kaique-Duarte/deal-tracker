@@ -1,6 +1,6 @@
 from database.base import Base
-from sqlalchemy import Column, Integer, BigInteger
-
+from sqlalchemy import Column, Integer, BigInteger, DateTime
+from sqlalchemy.sql import func
 
 
 class User(Base):
@@ -8,7 +8,8 @@ class User(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     chat_id = Column(BigInteger, unique=True)
-    
+    create_at = Column(DateTime, server_default=func.now())
+    update_at = Column(DateTime, server_default=func.now(), update_at=func.now())
 
     
         
