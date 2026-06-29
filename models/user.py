@@ -9,7 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     chat_id = Column(BigInteger, unique=True)
     create_at = Column(DateTime, server_default=func.now())
-    update_at = Column(DateTime, server_default=func.now(), update_at=func.now())
+    update_at = Column(DateTime, server_default=func.now(), server_onupdate=func.now())
 
     
         
