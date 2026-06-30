@@ -13,4 +13,6 @@ Sem estresse, sem ficar caçando desconto: eu faço o trabalho sujo por você �
     with sessionLocal() as session:
         user_service = UserServices(session)
         user_service.register_user(message.chat.id)
+ 
+        
     
