@@ -10,6 +10,7 @@ class User(Base):
     chat_id = Column(BigInteger, unique=True)
     username = Column(String(50), nullable=False)
     create_at = Column(DateTime, server_default=func.now())
+    update_at = Column(DateTime, server_default=func.now(), server_onupdate=func.now())
 
     
         
