@@ -6,8 +6,9 @@ from database.engine import engine
 from database.base import Base
 from models.user import User
 from models.games import Games
+from models.user_watch_games import UserWatchGames
 async def main():
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(bind=engine)
     
     bot = DealTrackerBot(TOKEN)
     print("BOT Iniciado Com Sucesso :)")

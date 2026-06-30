@@ -13,8 +13,8 @@ class UserRepository:
         
         return result.scalar()
     
-    def create_user(self, chat_id: int):
-        user = User(chat_id=chat_id)
+    def create_user(self, chat_id: int, username: str):
+        user = User(chat_id=chat_id, username=username)
         
         self.session.add(user)
 

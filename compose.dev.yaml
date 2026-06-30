@@ -7,7 +7,7 @@ services:
       - postgres
     volumes: # dev
       - .:/usr/src/app
-    command: watchfiles "python main.py" .
+    command: watchfiles --filter python --grace-period 2 "python main.py" .
 
   postgres:
     image: postgres:17
