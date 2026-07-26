@@ -7,10 +7,6 @@ services:
       - .env
     depends_on:
       - postgres
-    volumes: # dev
-      - .:/usr/src/app
-    command: watchfiles --filter python --grace-period 2 "python main.py" .
-    
 
   postgres:
     image: postgres:17
@@ -21,8 +17,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:  # dev
-      - "5432:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
