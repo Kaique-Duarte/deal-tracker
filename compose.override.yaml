@@ -1,0 +1,8 @@
+services:
+  bot:
+    volumes: # dev
+    - .:/usr/src/app
+    command: watchfiles --filter python --grace-period 2 " sleep 2 python main.py" .
+  postgres:
+    ports:  # dev
+    - "5432:5432"
