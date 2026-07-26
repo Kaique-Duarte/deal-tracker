@@ -1,6 +1,8 @@
 services:
   bot:
-    build: . 
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     env_file:
       - .env
     depends_on:
@@ -8,6 +10,7 @@ services:
     volumes: # dev
       - .:/usr/src/app
     command: watchfiles --filter python --grace-period 2 "python main.py" .
+    
 
   postgres:
     image: postgres:17
