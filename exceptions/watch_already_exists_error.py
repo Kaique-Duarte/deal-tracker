@@ -1,0 +1,2 @@
+class WatchAlreadyExistsError(Exception):
+    pass
