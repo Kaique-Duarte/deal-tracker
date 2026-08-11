@@ -1,8 +1,10 @@
 from aiogram import Router, F
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import Message, CallbackQuery
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import Command, CommandObject
-from services.games_service import GamesService
+from services import GamesService, WatchService
 from database.engine import sessionLocal
+from utils.build_game_result import build_game_result
 from utils.normalize import normalize
 router = Router()
 
@@ -13,36 +15,36 @@ async def search_handler(message: Message, command: CommandObject):
     with sessionLocal() as session:
         games_service = GamesService(session=session)
         games = await games_service.search_game(games_name)
+    print(games, flush=True)
+    builder = InlineKeyboardBuilder()
+    print(games, flush=True)
+    for game in games:
+        print(game, flush=True)
+        builder.button(text=game['name'], callback_data=f"game:{game['id']}")
+    
+    builder.adjust(1)    
 
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="1° Opção", callback_data="opção_1"),
-                InlineKeyboardButton(text="2° Opção", callback_data="opção_2"),
-                InlineKeyboardButton(text="3° Opção", callback_data="opção_3"),
-            ]
-        ]
-    )
-
+    custom_message = await build_game_result(games)
    
 
     await message.answer(
-        f" {games}\n Selecione uma das três opções disponíveis ou realize uma nova busca.",
-        reply_markup=keyboard,
+        f" {custom_message}\n Selecione uma das três opções disponíveis ou realize uma nova busca.\n OBS: ao clicar no botão o jogo será acompanhado!",
+        reply_markup=builder.as_markup(),
     )
     
     
-@router.callback_query(F.data == "opção_1")
-async def handle_opcao_1(callback: CallbackQuery):
-    print("OPÇÂO UMMMMMMMMMMMMM", flush=True)
+
     
-@router.callback_query(F.data == "opção_2")
-async def handle_opcao_2(callback: CallbackQuery):
-    print("OPÇÂO Doisssssss", flush=True)
-    
-@router.callback_query(F.data == "opção_3")
-async def handle_opcao_3(callback: CallbackQuery):
-    print("OPÇÂO Trêssssss", flush=True)
+@router.callback_query(F.data.startswith('game:'))
+async def callback_handler(callback: CallbackQuery):
+    print(callback.data , flush=True)
+    appid = int(callback.data.split(':')[1])
+    with sessionLocal() as session:
+        watch_service = WatchService(session)
+        await watch_service.watch_game(steam_app_id=appid, chat_id=callback.from_user.id)
+
+    await callback.message.answer("✅ Jogo adicionado ao acompanhamento!")
+
        
        
  

@@ -1,0 +1,2 @@
+class GamesAlreadyExistsError(Exception):
+    pass
