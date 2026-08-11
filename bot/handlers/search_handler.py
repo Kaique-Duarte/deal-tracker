@@ -28,7 +28,7 @@ async def search_handler(message: Message, command: CommandObject):
    
 
     await message.answer(
-        f" {custom_message}\n Selecione uma das três opções disponíveis ou realize uma nova busca.",
+        f" {custom_message}\n Selecione uma das três opções disponíveis ou realize uma nova busca.\n OBS: ao clicar no botão o jogo será acompanhado!",
         reply_markup=builder.as_markup(),
     )
     
