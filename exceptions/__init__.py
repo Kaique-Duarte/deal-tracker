@@ -3,3 +3,4 @@ from .game_already_exists_error import GamesAlreadyExistsError
 from .user_not_found_error import UserNotFoundError
 from .game_not_found_error import GameNotFoundError
 from .watch_already_exists_error import WatchAlreadyExistsError 
+from .watch_games_not_found_error import WatchGamesNotFoundError

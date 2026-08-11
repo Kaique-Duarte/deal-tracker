@@ -14,7 +14,6 @@ class DealTrackerBot:
             await self.bot.set_my_commands([
                 BotCommand(command="start", description="inicia o Bot"),
                 BotCommand(command="search", description="EX: /search Nome do Jogo"),
-                BotCommand(command="add", description="Adiciona O jogo")
             ])
             
             await self.dp.start_polling(self.bot)

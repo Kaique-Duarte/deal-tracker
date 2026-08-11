@@ -1,0 +1,2 @@
+class WatchGamesNotFoundError(Exception):
+    pass
