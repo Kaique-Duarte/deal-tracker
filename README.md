@@ -1,165 +1,154 @@
 # Deal Tracker Bot
 
-Bot para Telegram que consulta jogos na Steam, registra usuários no banco e organiza a base para acompanhamento de títulos e preços. O projeto já permite iniciar o bot, pesquisar jogos e persistir dados em PostgreSQL, enquanto parte das funcionalidades de monitoramento ainda está em evolução.
+O Deal Tracker Bot é um bot para Telegram desenvolvido em Python para acompanhar promoções de jogos da Steam. A proposta é simples: o usuário busca jogos, escolhe os que deseja acompanhar e recebe uma notificação quando houver desconto.
 
-## Sobre o projeto
+## O que a V1 faz
 
-O objetivo do Deal Tracker Bot é centralizar buscas de jogos da Steam dentro do Telegram e preparar uma base para alertas de preço e acompanhamento de promoções.
+Nesta primeira versão, o fluxo principal já está presente:
 
-No estado atual, o projeto:
+- cadastro de usuário ao iniciar o bot;
+- busca de jogos na Steam por comando de texto;
+- exibição dos resultados para o usuário;
+- seleção de jogos para acompanhamento via botão inline;
+- monitoramento periódico dos jogos acompanhados;
+- envio de notificação quando uma promoção é identificada.
 
-- inicia um bot Telegram com comandos básicos;
-- registra usuários quando recebem o comando `/start`;
-- busca jogos na Steam pelo comando `/search`;
-- consulta o banco antes de chamar a API pública da Steam;
-- mantém modelos e estrutura de persistência para usuários, jogos e relação de acompanhamento.
+## Fluxo principal
 
-Algumas partes do domínio já aparecem no código, mas ainda não estão totalmente conectadas ao fluxo principal, como notificações automáticas e o vínculo completo entre usuário e jogos monitorados.
+```text
+/start
+↓
+/search <jogo>
+↓
+Usuário seleciona o jogo
+↓
+Usuário ↔ Jogo
+↓
+APScheduler (a cada 1 hora)
+↓
+Steam API
+↓
+Promoção encontrada?
+↓
+Telegram → Notificação
+```
 
-## Tecnologias utilizadas
+## Relacionamento usuário ↔ jogo
 
-- Linguagem: Python
-- Bot framework: aiogram 3
-- Banco de dados: PostgreSQL 17
-- ORM e acesso a dados: SQLAlchemy 2
-- Cliente HTTP assíncrono: httpx
-- Variáveis de ambiente: python-dotenv e dotenv
-- Infraestrutura: Docker e Docker Compose
-- Biblioteca de PostgreSQL: psycopg2-binary
-- Observação de arquivos em desenvolvimento: watchfiles
-- Dependências presentes no projeto: APScheduler
+O acompanhamento é individual por usuário. A relação entre usuários e jogos é feita por uma tabela de associação, ou seja, um mesmo jogo pode ser acompanhado por vários usuários, e cada usuário recebe suas próprias notificações.
 
-## Arquitetura do projeto
+## Monitoramento e promoções
 
-O projeto segue uma organização em camadas simples:
+O monitoramento é executado pelo APScheduler a cada 1 hora. A tarefa verifica os jogos acompanhados, consulta os preços atuais na Steam e envia uma notificação ao usuário quando identifica uma promoção.
 
-- `bot/` concentra o bot e os handlers dos comandos do Telegram;
-- `services/` contém a regra de negócio e a orquestração entre fontes de dados;
-- `repositories/` acessa o banco via SQLAlchemy;
-- `integrations/` concentra integrações externas, como a Steam API;
-- `models/` define as entidades persistidas;
-- `database/` configura engine, sessão e base declarativa;
-- `config/` lê configuração e variáveis de ambiente;
-- `utils/` guarda utilitários pequenos, como normalização de texto.
+## Stack utilizada
 
-Fluxo geral da aplicação:
+- Python 3.14
+- aiogram 3 para o bot do Telegram
+- SQLAlchemy 2 para persistência e ORM
+- PostgreSQL como banco de dados
+- httpx para consumo da API da Steam
+- APScheduler para execução de tarefas agendadas
+- Docker e Docker Compose para execução em container
 
-1. `main.py` carrega a configuração, cria as tabelas e inicia o bot.
-2. O bot registra os routers dos comandos em `bot/handlers/`.
-3. Os handlers recebem as mensagens do Telegram e chamam os serviços.
-4. Os serviços decidem se a consulta será atendida pelo banco local ou pela Steam API.
-5. Os repositórios persistem ou consultam os dados usando SQLAlchemy.
+## Estrutura do projeto
 
-Boas práticas e padrões observados no código:
+```text
+deal-tracker/
+├── bot/
+│   └── handlers/
+├── config/
+├── database/
+├── exceptions/
+├── integrations/
+├── models/
+├── repositories/
+├── scheduler/
+├── services/
+├── utils/
+├── main.py
+├── requirements.txt
+├── compose.yaml
+├── Dockerfile.dev
+└── .env.example
+```
 
-- separação entre integração externa, regra de negócio e acesso a dados;
-- uso de sessão de banco por contexto;
-- consultas centralizadas em repositórios;
-- normalização simples do termo de busca antes da consulta;
-- criação automática das tabelas na inicialização.
+## Comandos do bot
 
-## Funcionalidades atuais
+- /start: apresenta o bot e registra o usuário.
+- /search <nome do jogo>: busca jogos na Steam com base no termo informado.
 
-- Comando `/start` para apresentar o bot e registrar o usuário no banco.
-- Comando `/search <nome do jogo>` para consultar jogos da Steam.
-- Prioridade de busca no banco local antes de consultar a API externa.
-- Retorno das três primeiras opções encontradas na Steam.
-- Estrutura de persistência para usuários, jogos e relacionamento de acompanhamento.
-- Inicialização do schema do banco ao subir a aplicação.
-- Dockerização do bot e do PostgreSQL para desenvolvimento local.
+Ao receber os resultados, o bot exibe botões inline para o usuário selecionar um jogo e adicioná-lo ao acompanhamento.
 
-## Como executar o projeto localmente
+## Como executar
 
 ### Pré-requisitos
 
-- Docker e Docker Compose.
-- Token de bot do Telegram.
+- Docker e Docker Compose, se for usar containers
+- Python 3.14 e PostgreSQL, se for rodar localmente
+- Token de um bot do Telegram
 
-### Configuração das variáveis de ambiente
+Para criar o token, abra o BotFather no Telegram, envie o comando /newbot, siga as instruções e copie o token gerado. Esse valor deve ser colocado na variável TOKEN do arquivo .env.
 
-Crie um arquivo `.env` na raiz do projeto com base em `.env.example`.
+Para instalar o Docker, consulte a documentação oficial: https://docs.docker.com/
 
-Variáveis usadas pelo código atual:
+### Configurando o ambiente
 
-- `TOKEN`: token do bot do Telegram.
-- `DB_URL`: string de conexão SQLAlchemy para o banco.
-- `DB_NAME`: nome do banco usado pelo container PostgreSQL.
-- `DB_USER`: usuário do PostgreSQL.
-- `DB_PASSWORD`: senha do PostgreSQL.
-
-Exemplo de estrutura, sem valores reais:
+Crie um arquivo .env na raiz do projeto com base no arquivo .env.example:
 
 ```env
-TOKEN=
-DB_URL=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
+TOKEN=seu_token_do_telegram
+DB_URL=postgresql+psycopg2://usuario:senha@host:5432/banco
+DB_NAME=nome_do_banco
+DB_USER=usuario
+DB_PASSWORD=senha
 ```
 
 ### Executando com Docker
+
+No diretório do projeto, rode:
 
 ```bash
 docker compose up --build
 ```
 
-Essa é a forma prevista no projeto para subir tanto o bot quanto o PostgreSQL.
+Esse comando sobe o bot e o banco PostgreSQL.
 
-No ambiente de desenvolvimento, o override do Compose monta o código-fonte no container e reinicia a aplicação com `watchfiles` quando arquivos Python mudam.
+### Executando localmente
 
-## Configuração de ambiente
+No Linux ou macOS:
 
-O projeto depende de configuração externa para funcionar corretamente:
-
-- `.env`: contém o token do Telegram e a URL de conexão com o banco.
-- `compose.yaml`: define os serviços do bot e do PostgreSQL.
-- `compose.override.yaml`: ajusta o fluxo de desenvolvimento, expondo a porta do PostgreSQL e ativando reload automático do bot.
-- `Dockerfile.dev`: instala as dependências Python e executa `main.py`.
-
-O repositório já inclui `.env.example` para orientar a criação do arquivo local sem expor segredos.
-
-## Exemplos de uso
-
-Após iniciar o bot no Telegram:
-
-```text
-/start
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
 ```
 
-O bot responde com uma mensagem de apresentação e registra o usuário no banco caso ele ainda não exista.
+No Windows, em PowerShell:
 
-```text
-/search Elden Ring
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python main.py
 ```
 
-O bot normaliza o termo, consulta o banco e, se não houver resultado local, chama a Steam API para retornar as primeiras opções encontradas.
+No Windows, em CMD:
 
-Observação: os botões inline exibidos no retorno da busca ainda não executam a ação completa no código atual; os callbacks apenas imprimem mensagens no console.
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
+pip install -r requirements.txt
+python main.py
+```
 
-## Roadmap
+Certifique-se de que o PostgreSQL esteja acessível pela configuração informada em DB_URL.
 
-Melhorias que aparecem como evolução natural do estado atual do projeto:
+## Observação importante
 
-- finalizar o fluxo de seleção das opções retornadas na busca;
-- persistir automaticamente jogos consultados com mais consistência;
-- conectar `user_watch_games` ao fluxo principal de monitoramento;
-- implementar notificações automáticas de mudança de preço;
-- usar o agendador já presente nas dependências para checagens periódicas;
-- melhorar mensagens de erro e validação de entrada;
-- adicionar testes para serviços, repositórios e handlers.
-
-## Contribuição
-
-Contribuições são bem-vindas. Um fluxo simples para colaborar:
-
-1. Faça um fork ou crie uma branch a partir da principal.
-2. Instale as dependências e configure o `.env`.
-3. Implemente a melhoria mantendo a separação entre handler, service e repository.
-4. Teste localmente antes de abrir o pull request.
-5. Explique no PR o comportamento alterado e o impacto esperado.
-
-Ao contribuir, prefira manter o código alinhado com a estrutura atual do projeto e evite misturar regra de negócio com acesso direto ao banco nos handlers.
+Esta é a V1 do projeto. O fluxo principal já está funcional: usuário → busca → acompanhamento → scheduler → consulta de preço → notificação.
 
 ## Licença
 
-Este projeto está sob licença MIT. Consulte o arquivo [LICENSE](LICENSE) para o texto completo.
+Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
