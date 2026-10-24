@@ -12,10 +12,9 @@ class SteamService:
                 "name": item["name"],
                 "id": item["id"],
                 "price": {
-                    "initial": Decimal(str(item["price"]["initial"])) / Decimal("100"),
-                    "final": Decimal(str(item["price"]["final"])) / Decimal("100"),
+                    "initial": Decimal(str(item["price"]["initial"])) / Decimal(100),
+                    "final": Decimal(str(item["price"]["final"])) / Decimal(100),
                 },
             }
             for item in games[:3]
-            
         ]

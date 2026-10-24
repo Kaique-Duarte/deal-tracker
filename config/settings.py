@@ -1,6 +1,7 @@
-from dotenv import load_dotenv
-from pathlib import Path
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Carrega .env da raiz do projeto
 dotenv_path = Path(__file__).parent.parent / ".env"
